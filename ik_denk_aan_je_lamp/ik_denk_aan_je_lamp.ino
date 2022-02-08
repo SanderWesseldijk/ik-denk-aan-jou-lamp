@@ -64,6 +64,8 @@ void colorset(String color)
   {
     setRGB(255,255,0);
   }
+  delay(60000);
+  setRGB(0,0,0);
 }
 
 void setRGB(int red, int blue, int green)
