@@ -4,6 +4,8 @@
 
 #include <Arduino.h>
 
+#include <ArduinoJson.h>
+
 #include <ESP8266WiFi.h>
 #include <ESP8266WiFiMulti.h>
 
@@ -40,6 +42,36 @@ void setup()
   WiFiMulti.addAP("botspot", "qwertyuio");
 }
 
+void colorset(String color)
+{
+  if(color == "red")
+  {
+    setRGB(255,0,0);
+  }
+  else if(color == "green")
+  {
+    setRGB(0,0,255);
+  }
+  else if(color == "blue")
+  {
+    setRGB(0,255,0);
+  }
+  else if(color == "yellow")
+  {
+    setRGB(255,0,255);
+  }
+  else if(color =="purple")
+  {
+    setRGB(255,255,0);
+  }
+}
+
+void setRGB(int red, int blue, int green)
+{
+  analogWrite(RGB_RED, red);
+  analogWrite(RGB_BLUE, blue);
+  analogWrite(RGB_GREEN, green);
+}
 void loop() {
   // wait for WiFi connection
   if ((WiFiMulti.run() == WL_CONNECTED)) 
@@ -53,7 +85,7 @@ void loop() {
     HTTPClient https;
 
     Serial.print("[HTTPS] begin...\n");
-    if (https.begin(*client, "https://blokkendoos.it")) 
+    if (https.begin(*client, "https://sanderwr.nl/test.json")) 
     {  // HTTPS
 
       Serial.print("[HTTPS] GET...\n");
@@ -71,6 +103,18 @@ void loop() {
         {
           String payload = https.getString();
           Serial.println(payload);
+
+          StaticJsonBuffer<200> jsonBuffer;
+          JsonObject& root = jsonBuffer.parseObject(payload);
+
+          if(!root.success()) 
+          {
+            Serial.println("parseObject() failed");
+          }
+
+          String color = root["color"];
+          Serial.println(color);
+          colorset(color);
         }
       } else {
         Serial.printf("[HTTPS] GET... failed, error: %s\n", https.errorToString(httpCode).c_str());
@@ -84,11 +128,4 @@ void loop() {
 
   Serial.println("Wait 10s before next round...");
   delay(10000);
-}
-
-void setRGB(int red, int blue, int green)
-{
-  analogWrite(RGB_RED, red);
-  analogWrite(RGB_BLUE, blue);
-  analogWrite(RGB_GREEN, green);
 }
