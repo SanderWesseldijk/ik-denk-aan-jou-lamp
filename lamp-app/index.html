@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IkDenkAanJeLamp</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #004882;
+        }
+        .container {
+            margin: auto;
+            width: 50%;
+            padding: 10px;
+            }
+
+        .button {
+            position: relative;
+            display: block;
+            width: 200px;
+            height: 36px;
+            border-radius: 18px;
+            background-color: #1c89ff;
+            border: solid 1px transparent;
+            color: #fff;
+            font-size: 18px;
+            font-weight: 300;
+            cursor: pointer;
+            transition: all .1s ease-in-out;
+        }
+        .button:hover {
+            border-color: #fff;
+            transition: all .1s ease-in-out;
+        }
+    
+        h1 {
+            color: #fff;
+        }
+        span {
+            color: #fff;
+        }
+
+        .box select {
+            background-color: #0563af;
+            color: white;
+            padding: 12px;
+            width: 250px;
+            border: none;
+            font-size: 20px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
+            -webkit-appearance: button;
+            appearance: button;
+            outline: none;
+        }
+
+        .box::before {
+            content: "\f13a";
+            font-family: FontAwesome;
+            top: 0;
+            right: 0;
+            width: 20%;
+            height: 100%;
+            text-align: center;
+            font-size: 28px;
+            line-height: 45px;
+            color: rgba(255, 255, 255, 0.5);
+            pointer-events: none;
+        }
+
+        .box select option {
+            padding: 30px;
+        }
+    </style>
+
+</head>
+
+<body>
+    <div class="container">
+        <h1>Switch on your beloveds lamp!</h1>
+        <span id="message"></span>
+        <br />
+        <div class="box">
+            <select id="colors">
+                <option value="1">Red</option>
+                <option value="2">Yellow</option>
+                <option selected="selected" value="3">Green</option>
+                <option value="4">Blue</option>
+                <option value="5">Purple</option>
+            </select>
+        </div>
+    <button class="button" id="switch" onclick="clickHandler()">Turn on the lamp!</button>
+    </div>
+    
+
+    <script>
+        let url = "http://localhost:6001/turn-on/"
+        let lampId = "0f8fb3f6-88c2-11ec-a8a3-0242ac120002"
+        let userId = 1
+        async function clickHandler() {
+            messageBox = document.getElementById("message")
+            messageBox.innerHTML = ""
+            // grab color
+            let color = document.getElementById("colors").value;
+            
+            // send request
+            body = {lampId: lampId, userId: userId, color: color}
+            const response = await fetch(url, {
+                method: "POST",
+                headers: {
+                    "Accept": 'application/json',
+                    "Content-Type": 'application/json'
+                },
+                body: JSON.stringify(body)
+            })
+
+            // set response
+            const parsedResponse = await response.json();
+            messageBox.innerHTML = parsedResponse.message
+        }
+
+    </script>
+    
+</body>
+</html>
