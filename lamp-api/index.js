@@ -10,6 +10,8 @@ const colors = ["red", "yellow", "green", "blue", "purple"]
 const lampQueue = []
 const lamps = [{id:"0f8fb3f6-88c2-11ec-a8a3-0242ac120002", users: [1]}]
 const lampIds = ["0f8fb3f6-88c2-11ec-a8a3-0242ac120002"]
+const users = [{id: 1, name: "Max van Hattum"}]
+
 
 app.use(cors())
 
@@ -17,16 +19,45 @@ app.use(express.urlencoded({extended: true}))
 
 app.use(express.json())
 
+app.post("/user", function(req, res){
+    let name = req.body.name
+    let id = users.length -1
+    const user = { id: 1, name: name }
+    users.push(user)
+})
+
 app.post("/user/connect", function(req, res){
     //add user to lamp
-    req.body.lampId
-    req.body.userId
+    let lampId = req.body.lampId
+    let userId = req.body.userId
+
+    // check if lamp in lamps
+    let lampPresent = false    
+    for (const lamp of lamps) {
+        if(lampId == lamp.id){
+            lampPresent = true
+            lamp.users.push(userId)
+            break;
+        }
+    }
+
+    if(!lampPresent){
+        lamps.push({id: lampId, users:[userId]})
+    }
 })
 
 app.post("/lamp/remove", function(req, res){
     //remove user from lamp
-    req.body.lampId
-    req.body.userId
+    let lampId = req.body.lampId
+    let userId = req.body.userId
+
+    for (const lamp of lamps) {
+        if(lampId == lamp.id){
+            index = lamp.users.indexOf(userId)
+            lamp.users.splice(index, 1)
+            break;
+        }
+    }
 })
 
 app.get("/turn-on/:lampId", function(req, res){
