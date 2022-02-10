@@ -1,8 +1,10 @@
-#define RGB_RED 15
-#define RGB_BLUE 13
-#define RGB_GREEN 12
-
 #include <Arduino.h>
+
+#include <FastLED.h>
+#define LED_PIN 34
+#define NUM_LEDS 60
+
+CRGB leds[NUM_LEDS];
 
 #include <ArduinoJson.h>
 
@@ -17,12 +19,14 @@
 
 ESP8266WiFiMulti WiFiMulti;
 
+
+int REQUEST_AMMOUNT;
+char colors[3] = {0, 0, 0};
+
 void setup() 
 {
   // RGB_pinset
-  pinMode(RGB_RED, OUTPUT);
-  pinMode(RGB_BLUE, OUTPUT);
-  pinMode(RGB_GREEN, OUTPUT);
+  FastLED.addLeds<WS2812, LED_PIN, GRB>(leds, NUM_LEDS);
   
   Serial.begin(115200);
   // Serial.setDebugOutput(true);
@@ -42,39 +46,62 @@ void setup()
   WiFiMulti.addAP("botspot", "qwertyuio");
 }
 
-void colorset(String color)
+void colorset()
 {
-  if(color == "red")
+  for (int e = 0; e <=20; e++)
   {
-    setRGB(255,0,0);
+    switch (REQUEST_AMMOUNT)
+    {
+      case 1:
+        for (int i = 0; i <= 59; i++) 
+        {
+          leds[i] = CRGB ( 0, 0, 255);
+          FastLED.show();
+          delay(40);
+        }
+      break;
+      case 2:
+        for (int i = 0; i <= 59; i++) 
+        {
+          leds[i] = CRGB ( 0, 0, 255);
+          FastLED.show();
+          delay(40);
+        }
+        for (int i = 59; i >= 0; i--) 
+        {
+          leds[i] = CRGB ( 255, 0, 0);
+          FastLED.show();
+          delay(40);
+        }
+      break;
+      case 3:
+        Serial.println("check");
+        for (int i = 0; i <= 59; i++) 
+        {
+          leds[i] = CRGB ( 0, 0, 255);
+          FastLED.show();
+          delay(40);
+        }
+        for (int i = 59; i >= 0; i--) 
+        {
+          leds[i] = CRGB ( 255, 0, 0);
+          FastLED.show();
+          delay(40);
+        }
+        for (int i = 59; i >= 0; i--) 
+        {
+          leds[i] = CRGB ( 0, 255, 0);
+          FastLED.show();
+          delay(40);
+        }
+      break;
+    }
   }
-  else if(color == "green")
-  {
-    setRGB(0,0,255);
-  }
-  else if(color == "blue")
-  {
-    setRGB(0,255,0);
-  }
-  else if(color == "yellow")
-  {
-    setRGB(255,0,255);
-  }
-  else if(color =="purple")
-  {
-    setRGB(255,255,0);
-  }
+  REQUEST_AMMOUNT = 0;
   delay(60000);
-  setRGB(0,0,0);
 }
-
-void setRGB(int red, int blue, int green)
-{
-  analogWrite(RGB_RED, red);
-  analogWrite(RGB_BLUE, blue);
-  analogWrite(RGB_GREEN, green);
-}
-void loop() {
+void loop() 
+{   
   // wait for WiFi connection
   if ((WiFiMulti.run() == WL_CONNECTED)) 
   {
@@ -113,10 +140,19 @@ void loop() {
           {
             Serial.println("parseObject() failed");
           }
-
-          String color = root["color"];
-          Serial.println(color);
-          colorset(color);
+          String onoff = root["on"];
+          if(onoff == "true" && REQUEST_AMMOUNT < 3)
+          {
+            REQUEST_AMMOUNT ++;
+            String color = root["color"];
+            colors[REQUEST_AMMOUNT];
+          }
+          else
+          {
+            Serial.println("hellow");            
+            colorset();
+          }
+          delay(1000);            
         }
       } else {
         Serial.printf("[HTTPS] GET... failed, error: %s\n", https.errorToString(httpCode).c_str());
