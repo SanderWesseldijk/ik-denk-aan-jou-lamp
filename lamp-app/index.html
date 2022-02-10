@@ -57,8 +57,6 @@
         }
 
         .box::before {
-            content: "\f13a";
-            font-family: FontAwesome;
             top: 0;
             right: 0;
             width: 20%;
@@ -82,6 +80,7 @@
         <h1>Switch on your beloveds lamp!</h1>
         <span id="message"></span>
         <br />
+        <br />
         <div class="box">
             <select id="colors">
                 <option value="1">Red</option>
@@ -91,6 +90,7 @@
                 <option value="5">Purple</option>
             </select>
         </div>
+        <br />
     <button class="button" id="switch" onclick="clickHandler()">Turn on the lamp!</button>
     </div>
     
@@ -98,27 +98,41 @@
     <script>
         let url = "http://localhost:6001/turn-on/"
         let lampId = "0f8fb3f6-88c2-11ec-a8a3-0242ac120002"
-        let userId = 1
+        let pressed = false
+
+        function activate() {
+            pressed = false
+        }
+
         async function clickHandler() {
             messageBox = document.getElementById("message")
             messageBox.innerHTML = ""
-            // grab color
-            let color = document.getElementById("colors").value;
             
-            // send request
-            body = {lampId: lampId, userId: userId, color: color}
-            const response = await fetch(url, {
-                method: "POST",
-                headers: {
-                    "Accept": 'application/json',
-                    "Content-Type": 'application/json'
-                },
-                body: JSON.stringify(body)
-            })
+            if(!pressed){
+                // grab color
+                let color = document.getElementById("colors").value;
+                
+                // send request
+                body = {lampId: lampId, color: color}
+                const response = await fetch(url, {
+                    method: "POST",
+                    headers: {
+                        "Accept": 'application/json',
+                        "Content-Type": 'application/json'
+                    },
+                    body: JSON.stringify(body)
+                })
 
-            // set response
-            const parsedResponse = await response.json();
-            messageBox.innerHTML = parsedResponse.message
+                // set response
+                const parsedResponse = await response.json();
+                messageBox.innerHTML = parsedResponse.message 
+                pressed = true
+                setTimeout(activate, 300000)
+
+            } else {
+                messageBox.innerHTML = "Wait at least five minutes before trying to turn the lamp on again :)"
+            }
+        
         }
 
     </script>
